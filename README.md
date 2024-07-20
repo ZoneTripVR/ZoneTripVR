@@ -34,7 +34,7 @@
 
 1. Make sure the root params you can download from zonetripvr.com work with your final code draft
 2. Make sure you can launch your zone or your shader through ZoneLauncher
-3. Create a cover image 200px by 200px up to 1000px by 1000px, preferably a good screenshot but it can be anything that captures the vibe and follows the content policy
+3. Create a square cover image 200px by 200px up to 1000px by 1000px, preferably a good screenshot but it can be anything that captures the vibe and follows the content policy
 4. Look at example_shadertype_upload.zip or example_zonetype_upload.zip to see the format of what you should be uploading
 
 # Gotchas
