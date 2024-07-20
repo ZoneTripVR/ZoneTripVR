@@ -19,8 +19,8 @@
 # Creating Your First Zonetype or Shadertype
 
 1. Create a new zonetype or new shadertype on https://zonetripvr.com (you probably already did this) to correspond with what you are creating on your computer
-2. Modify the `ExampleZone` folder or the `ExampleShader` folder to your heart's content
-    1. Change the path in `Zone Scene` in the Inspector for the ZoneLauncher scene when you rename `ExampleZone`
+2. Modify the `Assets/Samples/Zone Trip/ExampleZone` folder or the `Assets/Samples/Zone Trip/ExampleShader` folder to your heart's content
+    1. Change the path in `Zone Scene` in the Inspector for the ZoneLauncher scene if/when you rename `ExampleZone`
 3. Do not modify anything else
 4. When you modify `ExampleZone.cs/setZoneParams()`, modify `ExampleZone.json/params/` too
     1. You don't have to modify any code when you modify `ExampleZone.json/shaders/#/`
