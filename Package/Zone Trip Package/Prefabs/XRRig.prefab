@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4994082811065430760}
   - component: {fileID: 4459408778456233183}
   - component: {fileID: 4738343136458468408}
+  - component: {fileID: 303253954252887189}
   m_Layer: 0
   m_Name: XRRig
   m_TagString: Untagged
@@ -74,6 +75,18 @@ MonoBehaviour:
   lhm: {fileID: 0}
   rhm: {fileID: 0}
   zps: {fileID: 8818784523904802570}
+--- !u!114 &303253954252887189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 155430386243159604}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5e6c8b75f21e2449898f302b895d0c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &981355846238459502
 GameObject:
   m_ObjectHideFlags: 0
