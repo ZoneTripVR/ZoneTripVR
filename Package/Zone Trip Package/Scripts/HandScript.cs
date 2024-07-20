@@ -1,22 +1,34 @@
 ﻿// Copyright 2024 SensoriMotion
 
 using UnityEngine;
-using UnityEngine.XR; // for CommonUsages
-using UnityEngine.XR.Interaction.Toolkit;
+using UnityEngine.InputSystem; // for InputActionReference
+using UnityEngine.XR.Interaction.Toolkit.Interactors; // for XRRayInteractor
 
 public class HandScript : MonoBehaviour {
-    public XRController handController;
     public GameObject capsule;
     public XRRayInteractor pointer;
+    public InputActionReference thumbstickAction, primaryButtonAction, menuButtonAction;
 
     public Vector2 thumbstickInput;
     public bool primaryPressed, primaryReleased, primaryWasPressed;
     public bool menuPressed, menuReleased, menuWasPressed;
 
+    void OnEnable() {
+        thumbstickAction.action.Enable();
+        primaryButtonAction.action.Enable();
+        menuButtonAction.action.Enable();
+    }
+
+    void OnDisable() {
+        thumbstickAction.action.Disable();
+        primaryButtonAction.action.Disable();
+        menuButtonAction.action.Disable();
+    }
+
     void Update() {
-        handController.inputDevice.TryGetFeatureValue(CommonUsages.primary2DAxis, out thumbstickInput);
-        handController.inputDevice.TryGetFeatureValue(CommonUsages.primaryButton, out primaryPressed);
-        handController.inputDevice.TryGetFeatureValue(CommonUsages.menuButton, out menuPressed);
+        thumbstickInput = thumbstickAction.action.ReadValue<Vector2>();
+        primaryPressed = primaryButtonAction.action.IsPressed();
+        menuPressed = menuButtonAction.action.IsPressed();
 
         primaryReleased = primaryWasPressed && !primaryPressed;
         primaryWasPressed = primaryPressed;

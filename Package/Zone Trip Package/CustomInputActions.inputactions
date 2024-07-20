@@ -1,0 +1,102 @@
+{
+    "name": "CustomInputActions",
+    "maps": [
+        {
+            "name": "Left",
+            "id": "5ff6faf5-c311-4a91-b75d-0625f8e5e8bf",
+            "actions": [
+                {
+                    "name": "Menu Button",
+                    "type": "Button",
+                    "id": "49b5eabf-9c0e-44eb-a617-2b4cd3d34788",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Haptic Device",
+                    "type": "PassThrough",
+                    "id": "76445779-1a6e-4b92-9331-4d3de0aa5f65",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "74540517-9b3c-4ec8-a524-44b159b709fa",
+                    "path": "<XRController>{LeftHand}/{MenuButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "45fd6c87-d01c-4ad1-9604-d17c1b8880d3",
+                    "path": "*/{Haptic}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Haptic Device",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Right",
+            "id": "d6cfc597-11cf-496c-9c5a-0f9997c1d2ee",
+            "actions": [
+                {
+                    "name": "Menu Button",
+                    "type": "Button",
+                    "id": "1fb10b0e-29e6-4d13-be21-ec18544aecca",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Haptic Device",
+                    "type": "PassThrough",
+                    "id": "0ce4fc0c-7e4e-457d-b292-b5bdfba9846d",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "de799d62-e76d-4010-a3af-1c158d824e3a",
+                    "path": "<XRController>{LeftHand}/{MenuButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Menu Button",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4b719a99-e416-445b-8bcf-0e03af2eafc5",
+                    "path": "<XRController>{RightHand}/{Haptic}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Haptic Device",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

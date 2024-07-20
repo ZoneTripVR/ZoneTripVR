@@ -114,7 +114,7 @@ public class ZoneParamsScript : MonoBehaviour {
             // explicit interpolation case
             epoch_start_time_next = (float) (double) epoch_starts_seconds[epoch_idx+1];
             time_between_epochs = epoch_start_time_next - epoch_start_time_current;
-            elapsed_epoch_fraction = elapsed_epoch_time / time_between_epochs; // floats and doubles mess
+            elapsed_epoch_fraction = elapsed_epoch_time / time_between_epochs;
             if (current_epoch["value"] is double) {
                 value = (double) current_epoch["value"] + (
                     (double) next_epoch["value"] - (double) current_epoch["value"]
