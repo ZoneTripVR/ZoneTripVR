@@ -7,6 +7,7 @@ using UnityEngine.XR.Interaction.Toolkit.Interactors; // for XRRayInteractor
 public class HandScript : MonoBehaviour {
     public GameObject capsule;
     public XRRayInteractor pointer;
+    // Note: primaryButtonAction must be the same as XR Ray Interactor / UI Press Input
     public InputActionReference thumbstickAction, primaryButtonAction, menuButtonAction;
 
     public Vector2 thumbstickInput;
