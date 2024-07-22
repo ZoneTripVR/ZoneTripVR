@@ -16,7 +16,7 @@ public class BodyParamsScript : MonoBehaviour {
     public float leftHandRestDistance, rightHandRestDistance;
     public float average_y;
     public float gazeAltitude, relativeGazeAltitude;
-    float rlHandsDisplacement, udHandsDisplacement, fbHandsDisplacement;
+    public float rlHandsDisplacement, udHandsDisplacement, fbHandsDisplacement;
 
     private Vector3 headUpInit = Vector3.up;
     private Vector3 leftHandInit = Vector3.zero;
