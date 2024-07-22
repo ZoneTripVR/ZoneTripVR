@@ -26,16 +26,21 @@
     1. You don't have to modify any code when you modify `ExampleZone.json/shaders/#/`
     2. "Download root params json" on the zonetripvr.com page that you created (for zonetypes, paste into `params/`; for shadertypes, paste into `shaders/#/`)
 5. Guidelines
-    1. Do not interact with the Internet or try to pull or maintain any kind of state between plays of your zone or shader. Each play should be a self-contained event that is essentially identical everytime (except of course for bodyParams input)
-    2. You can write code that attaches GameObjects within XRRig (e.g. to have things that move with your hands or head), but do not use code to modify any of the GameObjects themselves
-    3. All the assets for one zonetype or for one shadertype must be under 2MB, before compressing. Use generativity! And parameterize it!
+    1. Do not interact with the Internet or try to pull or maintain any kind of state between plays of your zone or shader. Each play should be a self-contained event that is essentially identical everytime (except of course for bodyParams input).
+    2. Do not modify EventSystem or XRInteractionManager
+        1. If you really want to for some reason, email the contact email address
+    3. You can write code that attaches GameObjects within XRRig (e.g. to have things that move with your hands or head), but do not use code to modify any of the GameObjects themselves, except for:
+        1. The camera Skybox in Head
+        2. If there is something else you want to modify, email the contact email address
+    4. All the assets for one zonetype or for one shadertype must be under 2MB, before compressing. Use generativity! And parameterize it!
 
 # Finalizing Your Zonetype or Shader
 
 1. Make sure the root params you can download from zonetripvr.com work with your final code draft
-2. Make sure you can launch your zone or your shader through ZoneLauncher
-3. Create a square cover image 200px by 200px up to 1000px by 1000px, preferably a good screenshot but it can be anything that captures the vibe and follows the content policy
-4. Look at example_shadertype_upload.zip or example_zonetype_upload.zip to see the format of what you should be uploading
+2. Make sure the root params create an interesting experience that also performs with a good frame rate (you will receive feedback about this and have the opportunity to adjust after submission)
+3. Make sure you can launch your zone or your shader through ZoneLauncher
+4. Create a square cover image from 200x200px to 1000x1000px, preferably a good screenshot but it can be anything that captures the vibe and follows the content policy
+5. Look at example_shadertype_upload.zip or example_zonetype_upload.zip to see the format of what you should be uploading
 
 # Gotchas
 
