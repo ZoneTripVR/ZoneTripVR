@@ -6,15 +6,14 @@
     1. If you've already installed to here previously, you may need to Update the VR Core project template
 4. Create a VR Core project in Unity Hub and open it in the Unity Editor
     1. Deselect "Connect to Unity Cloud" and "Use Unity Version Control" unless you have reasons not to
-5. Set `Edit > Project Settings > XR Plug-in Management > OpenXR > Render Mode` = Multi-pass
-6. (some day: "Install Zone Trip SDK from the Unity store". meanwhile...)
+5. (some day: "Install Zone Trip SDK from the Unity store". meanwhile...)
     1. Copy `Package/Zone Trip Package[/|.meta]` to `YourUnityProject/Assets/Zone Trip Package[/|.meta]` (yes `Assets`, not `Packages`)
     2. Copy `Sample/Zone Trip[/|.meta]` to `YourUnityProject/Assets/Samples/Zone Trip[/|.meta]`
-7. Open `Assets/Samples/Zone Trip/ExampleZone/ExampleZone.unity`, then do `File > Build Settings > Add open scenes`
-8. Open `Assets/Samples/Zone Trip/ZoneLauncher.unity`, then do `File > Build Settings > Add open scenes`
-9. Optional: Delete `Scenes/SampleScene` from `File > Build Settings > Scenes in Build` and then also the folders `Assets/Scenes`, `Assets/VRTemplateAssets`
-10. Set up your device as the OpenXR runtime (e.g. https://steamcommunity.com/sharedfiles/filedetails/?id=2791489010)
-11. Open `Assets/Samples/Zone Trip/ZoneLauncher.unity` and click play to launch it in your device
+6. Open `Assets/Samples/Zone Trip/ExampleZone/ExampleZone.unity`, then do `File > Build Settings > Add open scenes`
+7. Open `Assets/Samples/Zone Trip/ZoneLauncher.unity`, then do `File > Build Settings > Add open scenes`
+8. Optional: Delete `Scenes/SampleScene` from `File > Build Settings > Scenes in Build` and then also the folders `Assets/Scenes`, `Assets/VRTemplateAssets`
+9. Set up your device as the OpenXR runtime (e.g. https://steamcommunity.com/sharedfiles/filedetails/?id=2791489010)
+10. Open `Assets/Samples/Zone Trip/ZoneLauncher.unity` and click play to launch it in your device
 
 # Creating Your First Zonetype or Shadertype
 
