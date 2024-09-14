@@ -41,6 +41,10 @@ public class ZoneParamsScript : MonoBehaviour {
         zoneShadersOriginalCopy = (Dictionary<string,object>) zone["shaders"];
         zoneShaders = Json.DeepCopyDict(zoneShadersOriginalCopy);
 
+        if (!is_playlist_managed && zoneParams.ContainsKey("audio_url")) {
+            Debug.Log("Audio is played only in the official build.");
+        }
+
         evaluate_params_and_shaders();
     }
 
