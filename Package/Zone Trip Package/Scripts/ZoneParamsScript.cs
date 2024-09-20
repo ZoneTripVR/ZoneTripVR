@@ -185,15 +185,15 @@ public class ZoneParamsScript : MonoBehaviour {
 
         double wavelength_s = 60.0 / (double) math_function["bpm"];
         double phase_d = (double) math_function["phase"];
-        double phase_r = phase_d * Math.PI / 90.0;
+        double phase_r = phase_d * Math.PI / 180.0;
         double phase_f = phase_d / 360;
         double amplitude = (double) math_function["amplitude"];
 
         switch ((string) math_function["function"]) {
             case "sine":
-                return amplitude * Math.Sin(2.0 * Math.PI * time_t / wavelength_s - phase_r) + offset;
+                return amplitude * Math.Sin(2.0 * (Math.PI * time_t / wavelength_s - phase_r)) + offset;
             case "cosine":
-                return amplitude * Math.Cos(2.0 * Math.PI * time_t / wavelength_s - phase_r) + offset;
+                return amplitude * Math.Cos(2.0 * (Math.PI * time_t / wavelength_s - phase_r)) + offset;
             case "square":
                 return (pos_mod(time_t - phase_f * wavelength_s, wavelength_s) < (wavelength_s / 2.0) ? amplitude : -amplitude) + offset;
             case "triangle":
