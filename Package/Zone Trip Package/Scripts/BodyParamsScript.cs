@@ -15,10 +15,11 @@ public class BodyParamsScript : MonoBehaviour {
     public Vector3 corePosition;
     public float leftHandRestDistance, rightHandRestDistance;
     public float average_y;
-    public float gazeAltitude, relativeGazeAltitude;
+    public float gazeAltitude, relativeGazeAltitude, relativeGazeDeviation;
     public float rlHandsDisplacement, udHandsDisplacement, fbHandsDisplacement;
 
     private Vector3 headUpInit = Vector3.up;
+    private Vector3 headForwardInit = Vector3.forward;
     private Vector3 leftHandInit = Vector3.zero;
     private Vector3 rightHandInit = Vector3.zero;
     private Vector3 headInit = Vector3.zero;
@@ -27,6 +28,7 @@ public class BodyParamsScript : MonoBehaviour {
 
     void Update() { // this evaluates for all bodyParams, even ones that aren't being used // TODO optimize
         if (headUpInit.y == 1) headUpInit = head.transform.up; // == 1 for a few frames
+        if (headForwardInit.z == 1) headForwardInit = head.transform.forward; // == 1 for a few frames
         if (leftHandInit.x == 0) leftHandInit = leftHand.transform.position; // == 0 for a few frames, etc
         if (rightHandInit.x == 0) rightHandInit = rightHand.transform.position;
         if (headInit.x == 0) headInit = head.transform.position;
@@ -51,6 +53,7 @@ public class BodyParamsScript : MonoBehaviour {
         average_y = (leftHandPosition.y + rightHandPosition.y) / 2;
         gazeAltitude = 90.0f - Vector3.Angle(Vector3.up, head.transform.forward); // 90 when looking up, -90 when looking down
         relativeGazeAltitude = 90.0f - Vector3.Angle(headUpInit, head.transform.forward);
+        relativeGazeDeviation = Vector3.Angle(headForwardInit, head.transform.forward);
 
         leftThumbstick = leftHand.GetComponent<HandScript>().thumbstickInput;
         rightThumbstick = rightHand.GetComponent<HandScript>().thumbstickInput;
@@ -106,6 +109,7 @@ public class BodyParamsScript : MonoBehaviour {
             case "rightHandRestDistance": return rightHandRestDistance;
             case "gazeAltitude": return gazeAltitude;
             case "relativeGazeAltitude": return relativeGazeAltitude;
+            case "relativeGazeDeviation": return relativeGazeDeviation;
             case "leftThumbstick.x": return leftThumbstick.x;
             case "leftThumbstick.y": return leftThumbstick.y;
             case "rightThumbstick.x": return rightThumbstick.x;
