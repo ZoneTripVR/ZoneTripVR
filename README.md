@@ -9,7 +9,7 @@
 1. After having cloned this repo to your computer, duplicate any folder in wasm_api_v1_webgl2/ (say, fractal_window)
     1. Optional but recommended: rename the duplicate folder to whatever_new_name (this new name is for your convenience and does not need to match what's on zonetripvr.com)
     1. Optional but recommended: replace all instances of the string or substring 'fractal_window' with 'whatever_new_name' in the whatever_new_name/docker-compose.yml (2x) and whatever_new_name/app/dist/index.html (1x) in the new folder
-    1. Delete whatever_new_name/app/dist/wasm/*.wasm and whatever_new_name/app/dist/wasm/*.js
+    1. Delete whatever_new_name/app/dist/wasm/\*.wasm and whatever_new_name/app/dist/wasm/\*.js
 1. Modify lib.rs and and the .glsl shader files in whatever_new_name/app/src/ and (possibly) whatever_new_name/app/Cargo.toml and (probably not) whatever_new_name/app/.cargo/config.toml to implement your vision
     1. Your `ZoneParams` struct in lib.rs must follow the parameters you have added in your zonetype creation page on zonetripvr.com
         1. Click "Download root params json" on the zonetripvr.com page for the zonetype you are creating
