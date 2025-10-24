@@ -1,0 +1,24 @@
+services:
+  rust-webgl2vr-wasm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: wasm_cube_field # (no strict matching on this name)
+    ports:
+      - "8080:8080"
+    working_dir: /app
+    volumes:
+      - ./app/.cargo:/app/.cargo
+      - ./app/src:/app/src
+      - ./app/dist:/app/dist
+    environment:
+      - ZNAME=cube_field # ZNAME definition 1 of 2
+    command: >
+      sh -c "
+      (wasm-pack build --target web || echo 'wasm-pack build failed. fix and try manually in docker exec.') &&
+      (python3 -m http.server --bind 0.0.0.0 8080 --directory dist &) &&
+      while true; do
+        cp pkg/foo_bg.wasm dist/wasm/$${ZNAME}_bg.wasm;
+        sed 's/foo_bg.wasm/'$${ZNAME}'_bg.wasm/g' pkg/foo.js > dist/wasm/$${ZNAME}.js;
+        sleep 5;
+      done"
