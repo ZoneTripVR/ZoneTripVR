@@ -244,6 +244,7 @@ function renderXrFrame(time, xrFrame) {
         pose.views.forEach((view, idx) => { // only one view in inline mode
             const shouldSetupFramebuffer = idx === 0;
             const viewport = xrSessionType === 'immersive-vr' ? baseLayer.getViewport(view) : inline_viewport;
+            enforceGraphicsApiRequirements(gl);
             window.wasmBindings.render_zone(
                 framebuffer,
                 shouldSetupFramebuffer,
@@ -279,4 +280,48 @@ function displayFPS(frameTime) {
     const fps = avgFrameTime > 0 ? 1.0 / avgFrameTime : 0;
 
     window.vrButton.textContent = Math.round(fps) + ' FPS';
+}
+
+function enforceGraphicsApiRequirements(gl) {
+    // Reset GPU settings
+    // Depth
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthFunc(gl.LESS);
+    gl.depthMask(true);
+    gl.depthRange(0.0, 1.0);
+    // Blending
+    gl.disable(gl.BLEND);
+    gl.blendFunc(gl.ONE, gl.ZERO);
+    gl.blendEquation(gl.FUNC_ADD);
+    gl.blendColor(0, 0, 0, 0);
+    // Face culling
+    gl.enable(gl.CULL_FACE);
+    gl.frontFace(gl.CCW);
+    gl.cullFace(gl.BACK);
+    // Color writing
+    gl.colorMask(true, true, true, true);
+    // Viewport/scissor
+    const { drawingBufferWidth: w, drawingBufferHeight: h } = gl;
+    gl.viewport(0, 0, w, h);
+    gl.scissor(0, 0, w, h);
+    gl.disable(gl.SCISSOR_TEST);
+    // Misc
+    gl.enable(gl.DITHER);
+    gl.disable(gl.STENCIL_TEST);
+    gl.disable(gl.POLYGON_OFFSET_FILL);
+    gl.lineWidth(1);
+    gl.polygonOffset(0, 0);
+
+    // Unbind program/VAO/textures
+    gl.useProgram(null);
+    gl.bindVertexArray(null);
+    gl.bindBuffer(gl.ARRAY_BUFFER, null);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+    gl.bindTexture(gl.TEXTURE_2D, null);
+    gl.bindTexture(gl.TEXTURE_CUBE_MAP, null);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+
+    // Clear color, depth, stencil buffer bits
+    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 }

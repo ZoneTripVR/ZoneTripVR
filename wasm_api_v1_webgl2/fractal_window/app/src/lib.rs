@@ -326,37 +326,37 @@ fn create_attributes(
     [
         // inner triangles
         0.0 + spacer0, 0.0 + spacer0, u_center, v_center,
-        0.0 + spacer0, 1.0 + spacer0, u_center, v_max,
         1.0 + spacer0, 0.0 + spacer0, u_max, v_center,
+        0.0 + spacer0, 1.0 + spacer0, u_center, v_max,
 
         0.0 + spacer0, 0.0 - spacer0, u_center, v_center,
-        1.0 + spacer0, 0.0 - spacer0, u_max, v_center,
         0.0 + spacer0, -1.0 - spacer0, u_center, v_min,
+        1.0 + spacer0, 0.0 - spacer0, u_max, v_center,
 
         0.0 - spacer0, 0.0 - spacer0, u_center, v_center,
-        0.0 - spacer0, -1.0 - spacer0, u_center, v_min,
         -1.0 - spacer0, 0.0 - spacer0, u_min, v_center,
+        0.0 - spacer0, -1.0 - spacer0, u_center, v_min,
 
         0.0 - spacer0, 0.0 + spacer0, u_center, v_center,
-        -1.0 - spacer0, 0.0 + spacer0, u_min, v_center,
         0.0 - spacer0, 1.0 + spacer0, u_center, v_max,
+        -1.0 - spacer0, 0.0 + spacer0, u_min, v_center,
 
         // outer triangles
         1.0 + spacer1, 1.0 + spacer1, u_max, v_max,
-        1.0 + spacer1, 0.0 + spacer1, u_max, v_center,
         0.0 + spacer1, 1.0 + spacer1, u_center, v_max,
+        1.0 + spacer1, 0.0 + spacer1, u_max, v_center,
 
         1.0 + spacer1, -1.0 - spacer1, u_max, v_min,
-        0.0 + spacer1, -1.0 - spacer1, u_center, v_min,
         1.0 + spacer1, 0.0 - spacer1, u_max, v_center,
+        0.0 + spacer1, -1.0 - spacer1, u_center, v_min,
 
         -1.0 - spacer1, -1.0 - spacer1, u_min, v_min,
-        -1.0 - spacer1, 0.0 - spacer1, u_min, v_center,
         0.0 - spacer1, -1.0 - spacer1, u_center, v_min,
+        -1.0 - spacer1, 0.0 - spacer1, u_min, v_center,
 
         -1.0 - spacer1, 1.0 + spacer1, u_min, v_max,
-        0.0 - spacer1, 1.0 + spacer1, u_center, v_max,
         -1.0 - spacer1, 0.0 + spacer1, u_min, v_center,
+        0.0 - spacer1, 1.0 + spacer1, u_center, v_max,
     ]
 }
 
