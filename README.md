@@ -1,9 +1,11 @@
-# Setting Up Requirements
+This repo provides some infrastructure and workflows for generating a Zone Trip-compatible zonetype. A Zone Trip-compatible zonetype is a wasm file + wasm glue file pair that satisfies the init_zone() and render_zone() of Zone Trip's v1 API (or future APIs). You may generate that pair any way you want; you do not have to use this repo. This repo is for your convenience.
+
+# Setting Up
 
 1. Clone this repository (or a fork of it) to your computer
 1. Install Docker (https://docs.docker.com/engine/install/)
 
-# Creating Your First Zonetype
+# Creating Your New Zonetype
 
 1. Create a new zonetype on https://zonetripvr.com (you probably already did this and that is why you are here) to correspond with what you are creating on your computer
 1. After having cloned this repo to your computer, duplicate any folder in wasm_api_v1_webgl2/ (say, fractal_window)
@@ -17,6 +19,7 @@
     1. Do not modify anything else
     1. Note you must respect the API for init_zone() and render_zone(), as these are called by Zone Trip with their respective arguments in their respective order
     1. Note it will very likely be relevant to add fields to or remove fields from the `Zone` struct in lib.rs as this is what carries data from init_zone to render_zone and between frames of render_zone
+    1. You may add additional files, but your build must end up as exactly 1 .wasm file + 1 .js glue file
 1. Guidelines
     1. Do not interact with the Internet in any way or try to pull or maintain any kind of state between plays of your zone. Each play should be a self-contained event that is essentially identical everytime (except of course for bodyParams input)
     1. If there is something else you want to modify, email the contact email address to make a feature request
@@ -32,7 +35,7 @@
     1. You can run `wasm-pack build --target web` here to re-compile (this is more convenient than `docker-compose down; docker-compose up`, which also re-compiles)
         1. Compilation info and errors will also appear here
     1. Note you will need to run `docker-compose down; docker-compose build --no-cache; docker-compose up` if you change whatever_new_name/app/Cargo.toml or whatever_new_name/app/.cargo/config.toml
-1. Once compilation succeeds, a .wasm and a .js wasm glue file will appear in whatever_new_name/app/dist/wasm/. Note that once you are satisfied and ready to submit, these exact files will be what you upload on zonetripvr.com (along with an additional .jpg cover image)
+1. Once compilation succeeds, a .wasm and a .js wasm glue file will appear in whatever_new_name/app/dist/wasm/. Note that once you are satisfied and ready to submit, these exact files will be what you upload on zonetripvr.com
 
 # Debugging Your New Zonetype (glsl and javascript)
 
@@ -64,12 +67,12 @@
 1. See how your zonetype works in VR
 1. See any errors in the console pane
 
-# Finalizing Your Zonetype
+# Finalizing Your New Zonetype
 
 1. Make sure your finalized root params you download from zonetripvr.com into zone-params.js work with your final code draft
 1. Make sure your finalized root params create an interesting experience (i.e. no blank screens or similarly trivial graphical states) that also performs with a good frame rate (you will receive feedback about this and have the opportunity to adjust after submission)
-1. Create a square cover image from 200x200px to 1000x1000px, preferably a good screenshot but it can be anything that captures the vibe and follows the content policy
-1. Upload your three .wasm, .js, and .jpg files for your zonetype. Look at example_uploads/ for examples of what you should be uploading
+1. Upload your .wasm file and .js file for your zonetype. Look at example_uploads/ for examples of what you should be uploading
+1. Your uploads will undergo a technical and security review after submission
 
 # Gotchas
 
