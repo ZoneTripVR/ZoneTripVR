@@ -174,10 +174,11 @@ function renderXrFrame(time, xrFrame) {
         const xRotation = Math.sin(elapsedTime) * 0.4;
         const yRotation = Math.cos(elapsedTime) * 0.4;
         const zRotation = 0.0;
+        const handsDeltaY = -xrReferenceSpaceDeltaY - 0.7;
 
-        leftHand.transform.position.y = 0.75 + Math.cos(2.0 * elapsedTime) * 0.4;
+        leftHand.transform.position.y = Math.cos(2.0 * elapsedTime) * 0.4 + handsDeltaY;
         leftHand.transform.orientation = eulerAnglesToQuaternion(xRotation, yRotation, zRotation);
-        rightHand.transform.position.y = 0.75 + Math.sin(2.0 * elapsedTime) * 0.4;
+        rightHand.transform.position.y = Math.sin(2.0 * elapsedTime) * 0.4 + handsDeltaY;
         rightHand.transform.orientation = eulerAnglesToQuaternion(-xRotation, -yRotation, zRotation);
         // leftThumbstick = something;
         // rightThumbstick = something;
