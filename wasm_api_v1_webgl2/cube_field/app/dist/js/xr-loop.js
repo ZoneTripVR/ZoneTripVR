@@ -233,7 +233,7 @@ function renderXrFrame(time, xrFrame) {
 
         if (startTime === null) {
             startTime = time;
-            window.wasmBindings.init_zone(gl, zoneParamsJson);
+            window.wasmBindings.init_zone(gl, frameNumber, zoneParamsJson);
             frameNumber++;
         } else {
             const frameTime = (time - lastTime) / 1000.0;

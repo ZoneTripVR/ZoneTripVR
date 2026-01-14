@@ -1,5 +1,6 @@
 # Use the official Rust image as the base
-FROM rust@sha256:39a313498ed0d74ccc01efb98ec5957462ac5a43d0ef73a6878f745b45ebfd2c
+# https://hub.docker.com/layers/library/rust/latest/images/sha256-612db8ad5234fec88a2811e6c8dfca298a97192bfc9a81977b92e200e51bf5ad
+FROM rust@sha256:612db8ad5234fec88a2811e6c8dfca298a97192bfc9a81977b92e200e51bf5ad
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
@@ -16,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 RUN cargo install wasm-pack wasm-bindgen-cli
 
 # Install wasm-opt for WebAssembly optimizations (via Binaryen)
-RUN curl -L https://github.com/WebAssembly/binaryen/releases/download/version_116/binaryen-version_116-x86_64-linux.tar.gz | tar -xz -C /usr/local --strip-components=1
+RUN curl -L https://github.com/WebAssembly/binaryen/releases/download/version_125/binaryen-version_125-x86_64-linux.tar.gz | tar -xz -C /usr/local --strip-components=1
 
 # Install WebAssembly target for Rust
 RUN rustup target add wasm32-unknown-unknown

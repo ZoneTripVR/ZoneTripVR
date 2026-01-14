@@ -1,9 +1,8 @@
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-use serde::Deserialize;
 use std::f32::consts::PI;
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{
     console as ws_console,
     WebGl2RenderingContext as GL,
@@ -36,8 +35,8 @@ thread_local! {
 #[wasm_bindgen]
 pub fn init_zone(
     gl: GL,
-    zone_params_json: JsValue,
     frame_number: u32,
+    zone_params: ZoneParams,
 ) {
     ZONE.with(|z| {
         // std::panic::set_hook(Box::new(console_error_panic_hook::hook));
@@ -98,11 +97,9 @@ pub fn init_zone(
         gl.use_program(None); // end use shader program
 
         // n_history and history and history textures
-        let zone_params: ZoneParams = serde_wasm_bindgen::from_value(zone_params_json)
-            .expect("Failed to deserialize ZoneParams");
-        let n_side_cubes = zone_params.n_side_cubes;
+        let n_side_cubes = zone_params.n_side_cubes();
         
-        let n_history_raw = (n_side_cubes as f32 / 2.0 * ROOT_THREE * zone_params.viscosity).ceil() as i32;
+        let n_history_raw = (n_side_cubes as f32 / 2.0 * ROOT_THREE * zone_params.viscosity()).ceil() as i32;
         let n_history = ((n_history_raw + 4 - 1) / 4) * 4; // round up to multiple of 4 (= GPU_STRIDE / FLOAT_SIZE)
 
         let history = CubeHistory::new(&zone_params);
@@ -178,7 +175,7 @@ pub fn render_zone(
     projection_matrix: js_sys::Float32Array,
     frame_number: u32,
     _is_left_eye: bool,
-    zone_params_json: JsValue
+    zone_params: ZoneParams,
 ) {
     ZONE.with(|z| {
         if let Some(zone) = z.borrow_mut().as_mut() {
@@ -204,11 +201,9 @@ pub fn render_zone(
                 &view_matrix
             );
 
-            let zone_params: ZoneParams = serde_wasm_bindgen::from_value(zone_params_json)
-                .expect("Failed to deserialize ZoneParams");
-            zone.gl.uniform1i(Some(&zone.uniform_locations.n_side_cubes), zone_params.n_side_cubes);
-            zone.gl.uniform1f(Some(&zone.uniform_locations.viscosity), zone_params.viscosity);
-            zone.gl.uniform1f(Some(&zone.uniform_locations.cube_spacing), zone_params.cube_spacing);
+            zone.gl.uniform1i(Some(&zone.uniform_locations.n_side_cubes), zone_params.n_side_cubes());
+            zone.gl.uniform1f(Some(&zone.uniform_locations.viscosity), zone_params.viscosity());
+            zone.gl.uniform1f(Some(&zone.uniform_locations.cube_spacing), zone_params.cube_spacing());
             if frame_number != zone.frame_number {
                 zone.history.rotate(&zone_params);
                 update_history(zone);
@@ -317,22 +312,25 @@ fn update_texture(
     // zone.gl.bind_texture(GL::TEXTURE_2D, None); // ABSOLUTELY NOT THIS. THE TEXTURES DO NOT GET TRANSMITTED
 }
 
-#[derive(Debug, Deserialize)]
-pub struct ZoneParams {
-    pub n_side_cubes: i32, // not changeable
-    pub viscosity: f32,    // not changeable
-    pub cube_spacing: f32,  // changeable, but historyless
-    pub cube_color_r: f32,
-    pub cube_color_g: f32,
-    pub cube_color_b: f32,
-    pub odd_cube_size: f32,
-    pub even_cube_size: f32,
-    pub odd_cube_rotation_x: f32,
-    pub odd_cube_rotation_y: f32,
-    pub odd_cube_rotation_z: f32,
-    pub even_cube_rotation_x: f32,
-    pub even_cube_rotation_y: f32,
-    pub even_cube_rotation_z: f32,
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "any")]
+    pub type ZoneParams;
+    
+    #[wasm_bindgen(method, getter, js_name = n_side_cubes)] pub fn n_side_cubes(this: &ZoneParams) -> i32; // not changeable
+    #[wasm_bindgen(method, getter, js_name = viscosity)] pub fn viscosity(this: &ZoneParams) -> f32;       // not changeable
+    #[wasm_bindgen(method, getter, js_name = cube_spacing)] pub fn cube_spacing(this: &ZoneParams) -> f32; // changeable, but historyless
+    #[wasm_bindgen(method, getter, js_name = cube_color_r)] pub fn cube_color_r(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = cube_color_g)] pub fn cube_color_g(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = cube_color_b)] pub fn cube_color_b(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = odd_cube_size)] pub fn odd_cube_size(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = even_cube_size)] pub fn even_cube_size(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = odd_cube_rotation_x)] pub fn odd_cube_rotation_x(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = odd_cube_rotation_y)] pub fn odd_cube_rotation_y(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = odd_cube_rotation_z)] pub fn odd_cube_rotation_z(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = even_cube_rotation_x)] pub fn even_cube_rotation_x(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = even_cube_rotation_y)] pub fn even_cube_rotation_y(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = even_cube_rotation_z)] pub fn even_cube_rotation_z(this: &ZoneParams) -> f32;
 }
 
 struct UniformLocations {
@@ -358,7 +356,7 @@ struct CubeHistory {
 
 impl CubeHistory {
     fn new(zone_params: &ZoneParams) -> Self {
-        let n_history_raw = (zone_params.n_side_cubes as f32 / 2.0 * ROOT_THREE * zone_params.viscosity).ceil() as usize;
+        let n_history_raw = (zone_params.n_side_cubes() as f32 / 2.0 * ROOT_THREE * zone_params.viscosity()).ceil() as usize;
         let n_history = ((n_history_raw + 4 - 1) / 4) * 4; // round up to multiple of 4 (= 16 bytes (GPU stride) / 4 bytes (f32))
 
         Self {
@@ -378,23 +376,23 @@ impl CubeHistory {
         self.even_cube_rotation.rotate_right(1);
 
         self.cube_color[0] = [
-            zone_params.cube_color_r,
-            zone_params.cube_color_g,
-            zone_params.cube_color_b,
+            zone_params.cube_color_r(),
+            zone_params.cube_color_g(),
+            zone_params.cube_color_b(),
             1.0,
         ];
-        self.odd_cube_size[0] = zone_params.odd_cube_size;
-        self.even_cube_size[0] = zone_params.even_cube_size;
+        self.odd_cube_size[0] = zone_params.odd_cube_size();
+        self.even_cube_size[0] = zone_params.even_cube_size();
         self.odd_cube_rotation[0] = [
-            zone_params.odd_cube_rotation_x * PI / 180.0,
-            zone_params.odd_cube_rotation_y * PI / 180.0,
-            zone_params.odd_cube_rotation_z * PI / 180.0,
+            zone_params.odd_cube_rotation_x() * PI / 180.0,
+            zone_params.odd_cube_rotation_y() * PI / 180.0,
+            zone_params.odd_cube_rotation_z() * PI / 180.0,
             0.0, // just padding
         ];
         self.even_cube_rotation[0] = [
-            zone_params.even_cube_rotation_x * PI / 180.0,
-            zone_params.even_cube_rotation_y * PI / 180.0,
-            zone_params.even_cube_rotation_z * PI / 180.0,
+            zone_params.even_cube_rotation_x() * PI / 180.0,
+            zone_params.even_cube_rotation_y() * PI / 180.0,
+            zone_params.even_cube_rotation_z() * PI / 180.0,
             0.0, // just padding
         ];
     }

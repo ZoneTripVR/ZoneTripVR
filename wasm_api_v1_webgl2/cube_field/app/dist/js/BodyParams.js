@@ -7,15 +7,24 @@ class BodyParams {
     static FORWARD = { x: 0, y: 0, z: -1 };
 
     constructor(bodyPose) {
-        // let headRight = BodyParams.getDirectionFromTransform(BodyParams.RIGHT, bodyPose.head.transform);
-        let headUp = BodyParams.getDirectionFromTransform(BodyParams.UP, bodyPose.head.transform);
-        let headForward = BodyParams.getDirectionFromTransform(BodyParams.FORWARD, bodyPose.head.transform);
-
-        this.headUpInit = headUp;
-        this.headForwardInit = headForward;
-        this.leftHandInit = bodyPose.leftHand.transform.position;
-        this.rightHandInit = bodyPose.rightHand.transform.position;
-        this.headInit = bodyPose.head.transform.position;
+        // this.headRightInit = BodyParams.getDirectionFromTransform(BodyParams.RIGHT, bodyPose.head.transform);
+        this.headUpInit = BodyParams.getDirectionFromTransform(BodyParams.UP, bodyPose.head.transform);
+        this.headForwardInit = BodyParams.getDirectionFromTransform(BodyParams.FORWARD, bodyPose.head.transform);
+        this.leftHandInit = {
+            x: bodyPose.leftHand.transform.position.x,
+            y: bodyPose.leftHand.transform.position.y,
+            z: bodyPose.leftHand.transform.position.z,
+        };
+        this.rightHandInit = {
+            x: bodyPose.rightHand.transform.position.x,
+            y: bodyPose.rightHand.transform.position.y,
+            z: bodyPose.rightHand.transform.position.z,
+        };
+        this.headInit = {
+            x: bodyPose.head.transform.position.x,
+            y: bodyPose.head.transform.position.y,
+            z: bodyPose.head.transform.position.z,
+        };
 
         this.leftHandRotation = null;
         this.rightHandRotation = null;

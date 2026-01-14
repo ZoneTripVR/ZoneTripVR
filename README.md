@@ -14,14 +14,15 @@ This repo provides some infrastructure and workflows for generating a Zone Trip-
     1. Delete whatever_new_name/app/dist/wasm/\*.wasm and whatever_new_name/app/dist/wasm/\*.js
 1. Modify lib.rs and and the .glsl shader files in whatever_new_name/app/src/ and (possibly) whatever_new_name/app/Cargo.toml and (probably not) whatever_new_name/app/.cargo/config.toml to implement your vision
     1. Your `ZoneParams` struct in lib.rs must follow the parameters you have added in your zonetype creation page on zonetripvr.com
-        1. Click "Download root params json" on the zonetripvr.com page for the zonetype you are creating
-        1. Modify whatever_new_name/app/dist/zone-params.js by copy-pasting the above params json right after `window.zoneParams = ` to replace the previous params. You can also edit zone-params.js manually
+        1. Click "Download the root zone's zone-params.js" on the zonetripvr.com page for the zonetype you are creating and save to whatever_new_name/app/dist/zone-params.js
+        1. You can also edit zone-params.js manually
     1. Do not modify anything else
     1. Note you must respect the API for init_zone() and render_zone(), as these are called by Zone Trip with their respective arguments in their respective order
     1. Note it will very likely be relevant to add fields to or remove fields from the `Zone` struct in lib.rs as this is what carries data from init_zone to render_zone and between frames of render_zone
     1. You may add additional files, but your build must end up as exactly 1 .wasm file + 1 .js glue file
 1. Guidelines
-    1. Do not interact with the Internet in any way or try to pull or maintain any kind of state between plays of your zone. Each play should be a self-contained event that is essentially identical everytime (except of course for bodyParams input)
+    1. Do not interact with the Internet in any way or try to pull or maintain any kind of state between plays of your zone. Each play should be a self-contained event that is essentially identical everytime (except of course for bodyParams input). Violations will be flagged in the post-submission review.
+    1. Do not access powerful javascript objects like `window` or `document` in your wasm. Violations will be flagged in the post-submission review.
     1. If there is something else you want to modify, email the contact email address to make a feature request
     1. As much as possible, do not create brand new Vec's in each render_zone() call and instead re-use Vec's created in init_zone(). Also do not print to console in every render_zone(). These will substantially improve frame rate
     1. The .wasm must be under 500 kb and the .js wasm glue file under 100 kb. Use generativity! And parameterize it!
@@ -72,7 +73,7 @@ This repo provides some infrastructure and workflows for generating a Zone Trip-
 1. Make sure your finalized root params you download from zonetripvr.com into zone-params.js work with your final code draft
 1. Make sure your finalized root params create an interesting experience (i.e. no blank screens or similarly trivial graphical states) that also performs with a good frame rate (you will receive feedback about this and have the opportunity to adjust after submission)
 1. Upload your .wasm file and .js file for your zonetype. Look at example_uploads/ for examples of what you should be uploading
-1. Your uploads will undergo a technical and security review after submission
+1. Your uploads will undergo a technical and security review after submission (you will receive feedback about this and have the opportunity to adjust after submission)
 
 # Gotchas
 

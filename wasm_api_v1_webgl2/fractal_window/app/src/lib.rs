@@ -1,8 +1,7 @@
 #[global_allocator]
 static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
 
-use serde::Deserialize;
-use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
+use wasm_bindgen::prelude::wasm_bindgen;
 use web_sys::{
     console as ws_console,
     WebGl2RenderingContext as GL,
@@ -31,8 +30,8 @@ thread_local! {
 #[wasm_bindgen]
 pub fn init_zone(
     gl: GL,
-    _zone_params_json: JsValue,
     _frame_number: u32,
+    _zone_params: ZoneParams,
 ) {
     ZONE.with(|z| {
         // std::panic::set_hook(Box::new(console_error_panic_hook::hook));
@@ -159,16 +158,14 @@ pub fn render_zone(
     projection_matrix: js_sys::Float32Array,
     _frame_number: u32,
     _is_left_eye: bool,
-    zone_params_json: JsValue
+    zone_params: ZoneParams,
 ) {
     ZONE.with(|z| {
         if let Some(zone) = z.borrow_mut().as_mut() {
             // Set up
             zone.gl.bind_framebuffer(GL::FRAMEBUFFER, framebuffer.as_ref());
-            let zone_params: ZoneParams = serde_wasm_bindgen::from_value(zone_params_json)
-                .expect("Failed to deserialize ZoneParams");
             if should_setup_framebuffer {
-                zone.gl.clear_color(zone_params.sky_r, zone_params.sky_g, zone_params.sky_b, 1.0);
+                zone.gl.clear_color(zone_params.sky_r(), zone_params.sky_g(), zone_params.sky_b(), 1.0);
                 zone.gl.clear(GL::COLOR_BUFFER_BIT | GL::DEPTH_BUFFER_BIT);
             }
             zone.gl.viewport(viewport.x(), viewport.y(), viewport.width(), viewport.height());
@@ -178,8 +175,8 @@ pub fn render_zone(
             // Update attributes
             zone.gl.bind_buffer(GL::ARRAY_BUFFER, Some(&zone.attribute_buffer));
             let attributes = create_attributes(
-                zone_params.triangle_spacing,
-                zone_params.u_center, zone_params.v_center, zone_params.u_width, zone_params.v_height
+                zone_params.triangle_spacing(),
+                zone_params.u_center(), zone_params.v_center(), zone_params.u_width(), zone_params.v_height()
             );
             let attributes_array = js_sys::Float32Array::from(&attributes[..]);
             zone.gl.buffer_sub_data_with_i32_and_array_buffer_view(GL::ARRAY_BUFFER, 0, &attributes_array);
@@ -198,36 +195,36 @@ pub fn render_zone(
 
             zone.gl.uniform3f(
                 Some(&zone.uniform_locations.screen_position),
-                zone_params.screen_position_x, zone_params.screen_position_y, -zone_params.screen_position_z // -z because originally Unity coordinate frame
+                zone_params.screen_position_x(), zone_params.screen_position_y(), -zone_params.screen_position_z() // -z because originally Unity coordinate frame
             );
             zone.gl.uniform3f(
                 Some(&zone.uniform_locations.screen_scale),
-                zone_params.screen_scale_x, zone_params.screen_scale_y, zone_params.screen_scale_z
+                zone_params.screen_scale_x(), zone_params.screen_scale_y(), zone_params.screen_scale_z()
             );
-            zone.gl.uniform1i(Some(&zone.uniform_locations.is_julia), if zone_params._IsJulia { 1 } else { 0 });
-            zone.gl.uniform1f(Some(&zone.uniform_locations.c_re), zone_params._c_re);
-            zone.gl.uniform1f(Some(&zone.uniform_locations.c_im), zone_params._c_im);
-            zone.gl.uniform1f(Some(&zone.uniform_locations.max_iterations), zone_params._MaxIterations);
-            zone.gl.uniform1f(Some(&zone.uniform_locations.power), zone_params._Power);
+            zone.gl.uniform1i(Some(&zone.uniform_locations.is_julia), if zone_params._IsJulia() { 1 } else { 0 });
+            zone.gl.uniform1f(Some(&zone.uniform_locations.c_re), zone_params._c_re());
+            zone.gl.uniform1f(Some(&zone.uniform_locations.c_im), zone_params._c_im());
+            zone.gl.uniform1f(Some(&zone.uniform_locations.max_iterations), zone_params._MaxIterations());
+            zone.gl.uniform1f(Some(&zone.uniform_locations.power), zone_params._Power());
             zone.gl.uniform3f(
                 Some(&zone.uniform_locations.color1),
-                zone_params._Color1R, zone_params._Color1G, zone_params._Color1B
+                zone_params._Color1R(), zone_params._Color1G(), zone_params._Color1B()
             );
             zone.gl.uniform3f(
                 Some(&zone.uniform_locations.color2),
-                zone_params._Color2R, zone_params._Color2G, zone_params._Color2B
+                zone_params._Color2R(), zone_params._Color2G(), zone_params._Color2B()
             );
             zone.gl.uniform3f(
                 Some(&zone.uniform_locations.color3),
-                zone_params._Color3R, zone_params._Color3G, zone_params._Color3B
+                zone_params._Color3R(), zone_params._Color3G(), zone_params._Color3B()
             );
             zone.gl.uniform3f(
                 Some(&zone.uniform_locations.set_color),
-                zone_params._SetColorR, zone_params._SetColorG, zone_params._SetColorB
+                zone_params._SetColorR(), zone_params._SetColorG(), zone_params._SetColorB()
             );
-            zone.gl.uniform1f(Some(&zone.uniform_locations.color_steps), zone_params._ColorSteps);
-            zone.gl.uniform1f(Some(&zone.uniform_locations.color_shift), zone_params._ColorShift);
-            zone.gl.uniform1i(Some(&zone.uniform_locations.is_color_smooth), if zone_params._IsColorSmooth { 1 } else { 0 });
+            zone.gl.uniform1f(Some(&zone.uniform_locations.color_steps), zone_params._ColorSteps());
+            zone.gl.uniform1f(Some(&zone.uniform_locations.color_shift), zone_params._ColorShift());
+            zone.gl.uniform1i(Some(&zone.uniform_locations.is_color_smooth), if zone_params._IsColorSmooth() { 1 } else { 0 });
 
             // Draw
             zone.gl.draw_elements_with_i32(
@@ -249,42 +246,45 @@ pub fn render_zone(
     });
 }
 
-#[derive(Debug, Deserialize)]
-pub struct ZoneParams {
-    pub triangle_spacing: f32,
-    pub sky_r: f32,
-    pub sky_g: f32,
-    pub sky_b: f32,
-    pub screen_position_x: f32,
-    pub screen_position_y: f32,
-    pub screen_position_z: f32,
-    pub screen_scale_x: f32,
-    pub screen_scale_y: f32,
-    pub screen_scale_z: f32,
-    pub u_center: f32,
-    pub v_center: f32,
-    pub u_width: f32,
-    pub v_height: f32,
-    pub _IsJulia: bool,
-    pub _c_re: f32,
-    pub _c_im: f32,
-    pub _MaxIterations: f32,
-    pub _Power: f32,
-    pub _Color1R: f32,
-    pub _Color1G: f32,
-    pub _Color1B: f32,
-    pub _Color2R: f32,
-    pub _Color2G: f32,
-    pub _Color2B: f32,
-    pub _Color3R: f32,
-    pub _Color3G: f32,
-    pub _Color3B: f32,
-    pub _SetColorR: f32,
-    pub _SetColorG: f32,
-    pub _SetColorB: f32,
-    pub _ColorSteps: f32,
-    pub _ColorShift: f32,
-    pub _IsColorSmooth: bool,
+#[wasm_bindgen]
+extern "C" {
+    #[wasm_bindgen(typescript_type = "any")]
+    pub type ZoneParams;
+    
+    #[wasm_bindgen(method, getter, js_name = triangle_spacing)] pub fn triangle_spacing(this: &ZoneParams) -> f32; // everything changeable
+    #[wasm_bindgen(method, getter, js_name = sky_r)] pub fn sky_r(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = sky_g)] pub fn sky_g(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = sky_b)] pub fn sky_b(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = screen_position_x)] pub fn screen_position_x(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = screen_position_y)] pub fn screen_position_y(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = screen_position_z)] pub fn screen_position_z(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = screen_scale_x)] pub fn screen_scale_x(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = screen_scale_y)] pub fn screen_scale_y(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = screen_scale_z)] pub fn screen_scale_z(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = u_center)] pub fn u_center(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = v_center)] pub fn v_center(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = u_width)] pub fn u_width(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = v_height)] pub fn v_height(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _IsJulia)] pub fn _IsJulia(this: &ZoneParams) -> bool;
+    #[wasm_bindgen(method, getter, js_name = _c_re)] pub fn _c_re(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _c_im)] pub fn _c_im(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _MaxIterations)] pub fn _MaxIterations(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Power)] pub fn _Power(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color1R)] pub fn _Color1R(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color1G)] pub fn _Color1G(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color1B)] pub fn _Color1B(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color2R)] pub fn _Color2R(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color2G)] pub fn _Color2G(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color2B)] pub fn _Color2B(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color3R)] pub fn _Color3R(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color3G)] pub fn _Color3G(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _Color3B)] pub fn _Color3B(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _SetColorR)] pub fn _SetColorR(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _SetColorG)] pub fn _SetColorG(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _SetColorB)] pub fn _SetColorB(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _ColorSteps)] pub fn _ColorSteps(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _ColorShift)] pub fn _ColorShift(this: &ZoneParams) -> f32;
+    #[wasm_bindgen(method, getter, js_name = _IsColorSmooth)] pub fn _IsColorSmooth(this: &ZoneParams) -> bool;
 }
 
 struct UniformLocations {
