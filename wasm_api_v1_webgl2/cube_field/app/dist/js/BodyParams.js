@@ -1,5 +1,5 @@
 
-// Copyright 2025 SensoriMotion
+// Copyright SensoriMotion
 
 class BodyParams {
     static RIGHT = { x: 1, y: 0, z: 0 };

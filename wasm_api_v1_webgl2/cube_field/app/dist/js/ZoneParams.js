@@ -1,5 +1,5 @@
 
-// Copyright 2025 SensoriMotion
+// Copyright SensoriMotion
 
 class ZoneParams {
     constructor(params, bodyParams) {
