@@ -43,10 +43,10 @@
     </head>
 
     <body>
-        <script src="js/BodyParams.js"></script>
         <script src="zone-params.js"></script>
-        <script src="js/ZoneParams.js"></script>
-        <script src="js/xr-loop.js"></script>
+        <script type="module" src="js/BodyParams.js"></script>
+        <script type="module" src="js/ZoneParams.js"></script>
+        <script type="module" src="js/xr-loop.js"></script>
         
         <script type="module">
             const wasmModule = await import(`/wasm/${ZNAME}.js`);

@@ -1,27 +1,26 @@
 
+// Copyright SensoriMotion
+
+import { BodyParams } from './BodyParams.js';
+import { ZoneParams } from './ZoneParams.js';
+
 let gl = null;
 let baseLayer = null;
 let xrSession = null;
-let xrReferenceSpace = null;
-let bodyParams = null;
-let zoneParams = null;
-
 let xrSessionType = null;
 let xrSessionFeatures = null;
+let xrReferenceSpace = null;
 let xrReferenceSpaceType = null;
-let xrReferenceSpaceDeltaY = null;
+let originLevel = null;
 
-// if (xrSessionType === 'inline') {
-//     console.log('Forcing `xrReferenceSpaceType = "viewer"` for `inline` mode');
-//     xrReferenceSpaceType = 'viewer';
-// }
-// if (xrReferenceSpaceType === 'local-floor') {
-//     console.log('Adding XR Features for local-floor');
-//     xrSessionFeatures = {
-//         requiredFeatures: ['local-floor'],
-//         optionalFeatures: ['bounded-floor'] // without this, `local-floor` merely = `local` + { x: 0, y: 1.6, z: 0 }
-//     }
-// }
+let bodyParams = new BodyParams();
+bodyParams.shouldResetInits = true;
+
+let zone = {
+    params: window.zoneParams,
+    paramsOriginalCopy: structuredClone(window.zoneParams),
+    previewMotion: 'basic_dance',
+};
 
 const inline_width = 800;
 const inline_height = 600;
@@ -32,25 +31,6 @@ let lastTime = null;
 let fpsSmoothing = 200;
 let fpsHistory = [];
 let frameNumber;
-
-const DEFAULT_LEFT_HAND_INPUT_SOURCE = {
-    transform: {
-        position: { x: -0.2, y: 0.75, z: -0.2 },
-        orientation: { x: 0, y: 0, z: 0, w: 1 }
-    },
-    gamepad: { axes: [0, 0, 0, 0] }
-};
-const DEFAULT_RIGHT_HAND_INPUT_SOURCE = {
-    transform: {
-        position: { x: 0.2, y: 0.75, z: -0.2 },
-        orientation: { x: 0, y: 0, z: 0, w: 1 }
-    },
-    gamepad: { axes: [0, 0, 0, 0] }
-};
-let leftHand = DEFAULT_LEFT_HAND_INPUT_SOURCE;
-let rightHand = DEFAULT_RIGHT_HAND_INPUT_SOURCE;
-let leftThumbstick = DEFAULT_LEFT_HAND_INPUT_SOURCE.gamepad.axes;
-let rightThumbstick = DEFAULT_RIGHT_HAND_INPUT_SOURCE.gamepad.axes;
 
 window.addEventListener("ZTApplicationStarted", (event) => {
     createXRStartButton();
@@ -92,25 +72,25 @@ function startXRSession(vrMode) {
             xrSessionType = 'inline';
             xrSessionFeatures = {};
             xrReferenceSpaceType = 'viewer';
-            xrReferenceSpaceDeltaY = 0.0;
+            originLevel = 'eye';
             break;
         case 'inline local-floor':
             xrSessionType = 'inline';
             xrSessionFeatures = {};
             xrReferenceSpaceType = 'viewer';
-            xrReferenceSpaceDeltaY = -1.6;
+            originLevel = 'floor';
             break;
         case 'immersive local':
             xrSessionType = 'immersive-vr';
             xrSessionFeatures = {};
             xrReferenceSpaceType = 'local';
-            xrReferenceSpaceDeltaY = 0.0;
+            originLevel = null;
             break;
         case 'immersive local-floor':
             xrSessionType = 'immersive-vr';
             xrSessionFeatures = { requiredFeatures: ['local-floor'], optionalFeatures: ['bounded-floor'] };
             xrReferenceSpaceType = 'local-floor';
-            xrReferenceSpaceDeltaY = 0.0;
+            originLevel = null;
             break;
         default:
             console.error(`Unrecognized vrMode: ${vrMode}`);
@@ -150,90 +130,37 @@ function startXRSession(vrMode) {
     }
 }
 
-function eulerAnglesToQuaternion(x, y, z) {
-    const cx = Math.cos(x / 2);
-    const sx = Math.sin(x / 2);
-    const cy = Math.cos(y / 2);
-    const sy = Math.sin(y / 2);
-    const cz = Math.cos(z / 2);
-    const sz = Math.sin(z / 2);
-
-    return {
-        x: sx * cy * cz - cx * sy * sz,
-        y: cx * sy * cz + sx * cy * sz,
-        z: cx * cy * sz - sx * sy * cz,
-        w: cx * cy * cz + sx * sy * sz,
-    };
-}
-
 function renderXrFrame(time, xrFrame) {
     const elapsedTime = startTime == null ? 0.0 : (time - startTime) / 1000; // (time - startTime) / 1000 || 0.0; // In seconds, default 0.0 eg when startTime null
-    let pose = null;
 
-    if (xrSessionType === 'inline') {
-        const xRotation = Math.sin(elapsedTime) * 0.4;
-        const yRotation = Math.cos(elapsedTime) * 0.4;
-        const zRotation = 0.0;
-        const handsDeltaY = -xrReferenceSpaceDeltaY - 0.7;
-
-        leftHand.transform.position.y = Math.cos(2.0 * elapsedTime) * 0.4 + handsDeltaY;
-        leftHand.transform.orientation = eulerAnglesToQuaternion(xRotation, yRotation, zRotation);
-        rightHand.transform.position.y = Math.sin(2.0 * elapsedTime) * 0.4 + handsDeltaY;
-        rightHand.transform.orientation = eulerAnglesToQuaternion(-xRotation, -yRotation, zRotation);
-        // leftThumbstick = something;
-        // rightThumbstick = something;
-
-        const quat = eulerAnglesToQuaternion(xRotation, yRotation, zRotation);
-        const offsetTransform = new XRRigidTransform(
-            { x: 0, y: xrReferenceSpaceDeltaY, z: 0 },           // Position offset
-            new DOMPointReadOnly(quat.x, quat.y, quat.z, quat.w) // Rotation offset
-        );
-        pose = xrFrame.getViewerPose(xrReferenceSpace.getOffsetReferenceSpace(offsetTransform));
+    // get values for (head) pose and controllers
+    if (xrSessionType !== 'inline') {
+        xrSession.inputSources.forEach(inputSource => {
+            if (inputSource.gripSpace && inputSource.gamepad && inputSource.gamepad.axes) {
+                const handPose = xrFrame.getPose(inputSource.gripSpace, xrReferenceSpace);
+                bodyParams.updateHand(inputSource.handedness, handPose, inputSource.gamepad.axes);
+            }
+        });
+        bodyParams.head = xrFrame.getViewerPose(xrReferenceSpace);
     } else {
-        pose = xrFrame.getViewerPose(xrReferenceSpace);
+        bodyParams.evaluatePreviewMotionAtT(zone.previewMotion, elapsedTime, originLevel);
+        const offsetTransform = new XRRigidTransform(
+            bodyParams.head.transform.position, bodyParams.head.transform.orientation);
+        bodyParams.head = xrFrame.getViewerPose(xrReferenceSpace.getOffsetReferenceSpace(offsetTransform)); // may not work on Firefox
     }
+    if (bodyParams.shouldResetInits) bodyParams.tryResetInits();
+    bodyParams.updateHistory(elapsedTime);
 
-    if (!pose) {
+    // evaluate params and render
+    if (!bodyParams.head) {
         console.error("Viewer pose is null.");
     } else {
-        if (xrSessionType !== 'inline') {
-            xrSession.inputSources.forEach(inputSource => {
-                if (inputSource.gripSpace) {
-                    handPose = xrFrame.getPose(inputSource.gripSpace, xrReferenceSpace);
-                    if (inputSource.handedness === "left") {
-                        leftHand = checkUpdate(leftHand, "leftHand", handPose);
-                    } else if (inputSource.handedness === "right") {
-                        rightHand = checkUpdate(rightHand, "rightHand", handPose);
-                    }
-                }
-                if (inputSource.gamepad && inputSource.gamepad.axes) {
-                    handPose = xrFrame.getPose(inputSource.gripSpace, xrReferenceSpace);
-                    if (inputSource.handedness === "left") {
-                        leftThumbstick = checkUpdate(leftThumbstick, "leftThumbstick", inputSource.gamepad.axes);
-                    } else if (inputSource.handedness === "right") {
-                        rightThumbstick = checkUpdate(rightThumbstick, "rightThumbstick", inputSource.gamepad.axes);
-                    }
-                }
-            });
-        }
-
-        const bodyPose = {
-            head: pose,
-            leftHand: leftHand,
-            rightHand: rightHand,
-            leftThumbstick: leftThumbstick,
-            rightThumbstick: rightThumbstick
-        };
-        if (bodyParams === null) {
-            bodyParams = new BodyParams(bodyPose);
-            zoneParams = new ZoneParams(window.zoneParams, bodyParams);
-        }
-        const zoneParamsJson = zoneParams.evaluateZoneParams(elapsedTime, bodyPose);
-        bodyParams.frameReset();
+        ZoneParams.evaluateZoneParams(zone, elapsedTime, bodyParams);
+        bodyParams.resetCachedParams();
 
         if (startTime === null) {
             startTime = time;
-            window.wasmBindings.init_zone(gl, frameNumber, zoneParamsJson);
+            window.wasmBindings.init_zone(gl, frameNumber, zone.params);
             frameNumber++;
         } else {
             const frameTime = (time - lastTime) / 1000.0;
@@ -241,11 +168,11 @@ function renderXrFrame(time, xrFrame) {
         }
         lastTime = time;
         
+        enforceGraphicsApiRequirements(gl);
         const framebuffer = xrSessionType === 'immersive-vr' ? baseLayer.framebuffer : null; // TODO do this in startXRSession?
-        pose.views.forEach((view, idx) => { // only one view in inline mode
+        bodyParams.head.views.forEach((view, idx) => { // only one view in inline mode
             const shouldSetupFramebuffer = idx === 0;
             const viewport = xrSessionType === 'immersive-vr' ? baseLayer.getViewport(view) : inline_viewport;
-            enforceGraphicsApiRequirements(gl);
             window.wasmBindings.render_zone(
                 framebuffer,
                 shouldSetupFramebuffer,
@@ -254,21 +181,12 @@ function renderXrFrame(time, xrFrame) {
                 view.projectionMatrix,
                 frameNumber,
                 view.eye === 'left',
-                zoneParamsJson
+                zone.params,
             );
         });
         frameNumber++;
     }
     xrSession.requestAnimationFrame(renderXrFrame);
-}
-
-function checkUpdate(pose, poseName, updatedPose) {
-    if (!updatedPose) {
-        console.error(`${poseName} is null, using last.`);
-        return pose;
-    } else {
-        return updatedPose;
-    }
 }
 
 function displayFPS(frameTime) {
