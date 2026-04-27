@@ -222,7 +222,6 @@ pub fn render_zone(
             // assert_eq!(error, GL::NO_ERROR, "OpenGL error: {:?}", error);
 
             // Wrap up
-            zone.gl.flush();
             zone.gl.bind_vertex_array(None);
             zone.gl.use_program(None);
         } else {
